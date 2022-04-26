@@ -107,7 +107,7 @@ var CakeStore = {
         } else {
             mainButton.setParams({
                 is_visible: !!CakeStore.canPay,
-                text: 'Заплатить ' + CakeStore.formatPrice(CakeStore.totalPrice) + ' ₽',
+                text: 'VIEW ORDER',
                 color: '#31b545'
             }).hideProgress();
         }
