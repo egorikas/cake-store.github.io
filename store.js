@@ -9,6 +9,8 @@ var CakeStore = {
 
     init: function (options) {
         Telegram.WebApp.ready();
+        $('.js-status').removeClass('shown')
+
         CakeStore.apiUrl = options.apiUrl;
         CakeStore.userId = options.userId;
         CakeStore.userHash = options.userHash;
@@ -27,6 +29,9 @@ var CakeStore = {
         $('body').toggleClass('loading', !!CakeStore.isLoading);
         CakeStore.updateTotalPrice();
     },
+    showStatus: function (text) {
+        $('.js-status').text(text).addClass('shown');
+    },
 
     getOrderData: function () {
         var order_data = [];
@@ -36,23 +41,52 @@ var CakeStore = {
             var count = +itemEl.data('item-count') || 0;
             var price = +itemEl.data('item-price') || 0;
             if (count > 0) {
-                order_data.push({ id: id, count: count, price: price});
+                order_data.push({ id: id, count: count, price: price });
             }
         });
         return JSON.stringify(order_data);
     },
 
     mainBtnClicked: function () {
-        if (!CakeStore.canPay || CakeStore.isLoading) {
-            return false;
-        }
+        // if (!CakeStore.canPay || CakeStore.isLoading) {
+        //     return false;
+        // }
+        var params = {
+            order_data: CakeStore.getOrderData()
+        };
         if (CakeStore.userId && CakeStore.userHash) {
             params.user_id = CakeStore.userId;
             params.user_hash = CakeStore.userHash;
         }
         CakeStore.toggleLoading(true);
+        CakeStore.apiRequest('makeOrder', params, function (result) {
+            CakeStore.toggleLoading(false);
+            if (result.ok) {
+                Telegram.WebApp.close();
+            }
+            if (result.error) {
+                CakeStore.showStatus(result.error);
+            }
+        });
         Telegram.WebApp.sendData(CakeStore.getOrderData())
         CakeStore.toggleLoading(false);
+    },
+    apiRequest: function (method, data, onCallback) {
+        var authData = Telegram.WebApp.initData || '';
+        $.ajax(CakeStore.apiUrl, {
+            type: 'POST',
+            data: $.extend(data, { _auth: authData, method: method }),
+            dataType: 'json',
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function (result) {
+                onCallback && onCallback(result);
+            },
+            error: function (xhr) {
+                onCallback && onCallback({ error: 'Server error' });
+            }
+        });
     },
 
     addCake: function (event) {
@@ -130,7 +164,7 @@ var CakeStore = {
                 is_visible: true,
                 color: '#65c36d'
             }).showProgress();
-        }  else {
+        } else {
             mainButton.setParams({
                 is_visible: !!CakeStore.canPay,
                 text: 'Заказать ' + CakeStore.totalPrice + '₽',
