@@ -43,9 +43,9 @@ var CakeStore = {
     },
 
     mainBtnClicked: function () {
-        // if (!CakeStore.canPay || CakeStore.isLoading) {
-        //     return false;
-        // }
+        if (!CakeStore.canPay || CakeStore.isLoading) {
+            return false;
+        }
         // if (CakeStore.userId && CakeStore.userHash) {
         //     params.user_id = CakeStore.userId;
         //     params.user_hash = CakeStore.userHash;
