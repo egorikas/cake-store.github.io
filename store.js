@@ -46,10 +46,10 @@ var CakeStore = {
         if (!CakeStore.canPay || CakeStore.isLoading) {
             return false;
         }
-        if (CakeStore.userId && CakeStore.userHash) {
-            params.user_id = CakeStore.userId;
-            params.user_hash = CakeStore.userHash;
-        }
+        // if (CakeStore.userId && CakeStore.userHash) {
+        //     params.user_id = CakeStore.userId;
+        //     params.user_hash = CakeStore.userHash;
+        // }
         CakeStore.toggleLoading(true);
         Telegram.WebApp.sendData(CakeStore.getOrderData())
         CakeStore.toggleLoading(false);
