@@ -73,7 +73,7 @@ var CakeStore = {
     },
     apiRequest: function (method, data, onCallback) {
         var authData = Telegram.WebApp.initData || '';
-        $.ajax(CakeStore.apiUrl, {
+        $.ajax('cafe/api', {
             type: 'POST',
             data: $.extend(data, { _auth: authData, method: method }),
             dataType: 'json',
@@ -84,7 +84,8 @@ var CakeStore = {
                 onCallback && onCallback(result);
             },
             error: function (xhr) {
-                onCallback && onCallback({ error: JSON.stringify(xhr) });
+                var err = eval("(" + xhr.responseText + ")");
+                onCallback && onCallback({ error: err });
             }
         });
     },
