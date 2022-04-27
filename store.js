@@ -21,6 +21,40 @@ var CakeStore = {
         }).onClick(CakeStore.mainBtnClicked);
     },
 
+    toggleLoading: function (loading) {
+        CakeStore.isLoading = loading;
+        CakeStore.updateMainButton();
+        $('body').toggleClass('loading', !!CakeStore.isLoading);
+        CakeStore.updateTotalPrice();
+    },
+
+    getOrderData: function () {
+        var order_data = [];
+        $('.js-item').each(function () {
+            var itemEl = $(this)
+            var id = itemEl.data('item-id');
+            var count = +itemEl.data('item-count') || 0;
+            var price = +itemEl.data('item-price') || 0;
+            if (count > 0) {
+                order_data.push({ id: id, count: count, price: price});
+            }
+        });
+        return JSON.stringify(order_data);
+    },
+
+    mainBtnClicked: function () {
+        if (!CakeStore.canPay || CakeStore.isLoading) {
+            return false;
+        }
+        if (CakeStore.userId && CakeStore.userHash) {
+            params.user_id = CakeStore.userId;
+            params.user_hash = CakeStore.userHash;
+        }
+        CakeStore.toggleLoading(true);
+        Telegram.WebApp.sendData(CakeStore.getOrderData())
+        CakeStore.toggleLoading(false);
+    },
+
     addCake: function (event) {
         event.preventDefault();
         var itemEl = $(this).parents('.js-item');
@@ -91,20 +125,12 @@ var CakeStore = {
     },
     updateMainButton: function () {
         var mainButton = Telegram.WebApp.MainButton;
-        if (CakeStore.modeOrder) {
-            if (CakeStore.isLoading) {
-                mainButton.setParams({
-                    is_visible: true,
-                    color: '#65c36d'
-                }).showProgress();
-            } else {
-                mainButton.setParams({
-                    is_visible: !!CakeStore.canPay,
-                    text: 'PAY ' + CakeStore.formatPrice(CakeStore.totalPrice),
-                    color: '#31b545'
-                }).hideProgress();
-            }
-        } else {
+        if (CakeStore.isLoading) {
+            mainButton.setParams({
+                is_visible: true,
+                color: '#65c36d'
+            }).showProgress();
+        }  else {
             mainButton.setParams({
                 is_visible: !!CakeStore.canPay,
                 text: 'Заказать ' + CakeStore.totalPrice + '₽',
