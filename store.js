@@ -43,16 +43,16 @@ var CakeStore = {
     },
 
     mainBtnClicked: function () {
-        if (!CakeStore.canPay || CakeStore.isLoading) {
-            return false;
-        }
+        // if (!CakeStore.canPay || CakeStore.isLoading) {
+        //     return false;
+        // }
         // if (CakeStore.userId && CakeStore.userHash) {
         //     params.user_id = CakeStore.userId;
         //     params.user_hash = CakeStore.userHash;
         // }
         CakeStore.toggleLoading(true);
-        Telegram.WebApp.sendData(CakeStore.getOrderData())
-        CakeStore.toggleLoading(false);
+        Telegram.WebApp.sendData(CakeStore.getOrderData());
+        Telegram.WebApp.close();
     },
 
     addCake: function (event) {
