@@ -35,8 +35,9 @@ var CakeStore = {
             var id = itemEl.data('item-id');
             var count = +itemEl.data('item-count') || 0;
             var price = +itemEl.data('item-price') || 0;
+            var title = itemEl.data('item-title') || '';
             if (count > 0) {
-                order_data.push({ id: id, count: count, price: price});
+                order_data.push({ id: id, count: count, price: price, title: title});
             }
         });
         return JSON.stringify(order_data);
